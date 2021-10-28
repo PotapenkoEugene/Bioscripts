@@ -30,16 +30,16 @@ with open(cluster_file_path) as f:
 
             # we don't see samples with 2
             elif len(annot) == 2:
-                raise TypeError('Don\'t see samples with 2 categories only')
+                repcount['/'.join(annot[:1])] += readnum
 
             elif len(annot) == 3:
                 repcount['/'.join(annot[:2])] += readnum
 
             elif len(annot) == 4:
-                repcount['/'.join(annot[:3]) + '/unknown/unknown'] += readnum
+                repcount['/'.join(annot[:3])] += readnum
 
             elif len(annot) == 5:
-                repcount['/'.join(annot[:4]) + '/unknown'] += readnum
+                repcount['/'.join(annot[:4])] += readnum
 
             elif len(annot) > 5:
                 repcount['/'.join(annot[:5])] += readnum
