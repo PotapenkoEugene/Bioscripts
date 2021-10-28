@@ -3,14 +3,10 @@ from collections import defaultdict
 
 # Paths
 cluster_file_path = sys.argv[1]
-typeoutpath = '.'.join(cluster_file_path.split('.')[:-1]) + '_TypeSummary.tsv'
-familyoutpath = '.'.join(cluster_file_path.split('.')[:-1]) + '_FamilySummary.tsv'
-subfamilypath = '.'.join(cluster_file_path.split('.')[:-1]) + '_SubfamilySummary.tsv'
+repoutpath = '.'.join(cluster_file_path.split('.')[:-1]) + '_RepeatSummary.tsv'
 
 # Create dicts
-typecount = defaultdict(int)
-familycount = defaultdict(int)
-subfamilycount = defaultdict(int)
+repcount = defaultdict(int)
 
 # Run on cluster output file of RepeatExplorer2
 with open(cluster_file_path) as f:
@@ -26,48 +22,36 @@ with open(cluster_file_path) as f:
             readnum = int(line_splt[2])
             annot = line_splt[4].split('/')
 
-            # skip if not annotated
-            if len(annot) == 1:
-                continue
-
 # ['"All', 'repeat', 'mobile_element', 'Class_II', 'Subclass_1', 'TIR', 'EnSpm_CACTA"']
-  
-            if len(annot) >= 3:
 
-                # count types
-                type = annot[2].strip('\"')
-                typecount[type] += readnum
+            # Start annotating on each level
+            if len(annot) == 1:
+                repcount['Unclassified'] += readnum
 
-                if 'mobile_element' in annot:
+            # we don't see samples with 2
+            elif len(annot) == 2:
+                raise TypeError('Don\'t see samples with 2 categories only')
 
-                    # count families
-                    family = annot[4].strip('\"')
-                    familycount[family] += readnum
+            elif len(annot) == 3:
+                repcount['/'.join(annot[:2])] += readnum
 
-                    # count subfamilies
-                    if len(annot) == 5:
-                        subfamily = 'unknown'
-                    elif len(annot) > 5:
-                        subfamily = annot[5].strip('\"')
-                    
-                    subfamilycount[family + '_' + subfamily] += readnum
+            elif len(annot) == 4:
+                repcount['/'.join(annot[:3]) + '/unknown/unknown'] += readnum
+
+            elif len(annot) == 5:
+                repcount['/'.join(annot[:4]) + '/unknown'] += readnum
+
+            elif len(annot) > 5:
+                repcount['/'.join(annot[:5])] += readnum
 
 
     # Get proportion
-    typecountproportion = {k:str(round(v/totalreadnum, 6)) for k, v in typecount.items()}
-    familycountproportion = {k: str(round(v / totalreadnum, 6)) for k, v in familycount.items()}
-    subfamilycountproportion = {k: str(round(v / totalreadnum, 6)) for k, v in subfamilycount.items()}
+    repcountproportion = {k:str(round(v/totalreadnum, 6)) for k, v in repcount.items()}
 
-    with open(typeoutpath, 'w') as typeW, \
-            open(familyoutpath, 'w') as familyW, \
-            open(subfamilypath, 'w') as subfamilyW:
+    with open(repoutpath, 'w') as repW:
 
         # Write headers
-        typeW.write('Type\tProportion\n')
-        familyW.write('Family\tProportion\n')
-        subfamilyW.write('Subfamily\tProportion\n')
+        repW.write('Annotation\tProportion\n')
 
         # Write tables
-        [typeW.write('\t'.join(i) + '\n') for i in typecountproportion.items()]
-        [familyW.write('\t'.join(i) + '\n') for i in familycountproportion.items()]
-        [subfamilyW.write('\t'.join(i) + '\n') for i in subfamilycountproportion.items()]
+        [repW.write('\t'.join(i) + '\n') for i in repcountproportion.items()]
