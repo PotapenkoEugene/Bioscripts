@@ -30,19 +30,19 @@ with open(cluster_file_path) as f:
 
             # we don't see samples with 2
             elif len(annot) == 2:
-                repcount['/'.join(annot[:1])] += readnum
+                repcount['/'.join(annot[:1]).strip('\"')] += readnum
 
             elif len(annot) == 3:
-                repcount['/'.join(annot[:2])] += readnum
+                repcount['/'.join(annot[:2]).strip('\"')] += readnum
 
             elif len(annot) == 4:
-                repcount['/'.join(annot[:3])] += readnum
+                repcount['/'.join(annot[:3]).strip('\"')] += readnum
 
             elif len(annot) == 5:
-                repcount['/'.join(annot[:4])] += readnum
+                repcount['/'.join(annot[:4]).strip('\"')] += readnum
 
             elif len(annot) > 5:
-                repcount['/'.join(annot[:5])] += readnum
+                repcount['/'.join(annot[:5]).strip('\"')] += readnum
 
 
     # Get proportion
