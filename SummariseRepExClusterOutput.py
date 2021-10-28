@@ -51,7 +51,7 @@ with open(cluster_file_path) as f:
     with open(repoutpath, 'w') as repW:
 
         # Write headers
-        repW.write('Annotation\tProportion\n')
+#        repW.write('Annotation\tProportion\n')
 
         # Write tables
-        [repW.write('\t'.join(i) + '\n') for i in repcountproportion.items()]
+        [repW.write('\t'.join(i) + '\t' + str(totalreadnum) + '\n' ) for i in repcountproportion.items()]
