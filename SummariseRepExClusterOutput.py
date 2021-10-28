@@ -30,6 +30,8 @@ with open(cluster_file_path) as f:
             if len(annot) == 1:
                 continue
 
+# ['"All', 'repeat', 'mobile_element', 'Class_II', 'Subclass_1', 'TIR', 'EnSpm_CACTA"']
+  
             if len(annot) >= 3:
 
                 # count types
@@ -43,10 +45,11 @@ with open(cluster_file_path) as f:
                     familycount[family] += readnum
 
                     # count subfamilies
-                    if len(annot) == 3:
+                    if len(annot) == 5:
                         subfamily = 'unknown'
-                    else:
+                    elif len(annot) > 5:
                         subfamily = annot[5].strip('\"')
+                    
                     subfamilycount[family + '_' + subfamily] += readnum
 
 
