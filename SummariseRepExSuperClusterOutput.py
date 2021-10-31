@@ -5,7 +5,7 @@ from collections import defaultdict
 supercluster_file_path = sys.argv[1]
 cluster_file_path = sys.argv[2]
 classification_file_path = sys.argv[3]
-samplename =sys.argv[4]
+samplename = sys.argv[4]
 
 repoutpath = '.'.join(supercluster_file_path.split('.')[:-1]) + '_RepeatSummary.tsv'
 
@@ -45,30 +45,26 @@ with open(repoutpath, 'w') as w:
     # Save annotations:
     for k, v in repcount.items():
         annotated = False
-        for cl in classif:
-            
-            annot_lvl =  [i for i,el in enumerate(cl) if el == k ]
-            if annot_lvl:
+        last_annot_lvl = (0, None)
 
+        for cl in classif:
+
+            # find on what level of annotation
+            annot_lvl = [i for i, el in enumerate(cl) if el == k]
+            # change level of annotation if annotated deeper
+            if annot_lvl:
+                if annot_lvl[0] > last_annot_lvl[0]:
+                    last_annot_lvl = (annot_lvl[0], cl)
                 annotated = True
 
-                if len(cl) == 2:
-                    res = cl + ['NA'] * 5
-                elif len(cl) == 3:
-                    res = cl + ['NA'] * 4
-                elif len(cl) == 4:
-                    res = cl + ['NA'] * 3
-                elif len(cl) == 5:
-                    res = cl + ['NA'] * 2
-                elif len(cl) == 6:
-                    res = cl + ['NA']
-                elif len(cl) == 7:
-                    res = cl
-                w.write('\t'.join(res + [str(v / totalreadnum)] + [str(totalreadnum)] + [samplename]) +'\n')
+        if annotated:
+
+            lvl = last_annot_lvl[0]
+            cl = last_annot_lvl[1]
+
+            res = cl[:lvl+1] + ['NA'] * (7-lvl-1)
+            w.write('\t'.join(res + [str(v / totalreadnum)] + [str(totalreadnum)] + [samplename]) + '\n')
 
         # If not annotated on last level - manually configure:
         if not annotated:
-            if k == 'LTR':
-                w.write('\t'.join(['Class_I'] + [k]*6 + [str(v / totalreadnum)] + [str(totalreadnum)] + [samplename]) + '\n')
-            else:
-                w.write('\t'.join([k]*7 + [str(v / totalreadnum)] + [str(totalreadnum)] + [samplename]) + '\n')
+            w.write('\t'.join([k] * 7 + [str(v / totalreadnum)] + [str(totalreadnum)] + [samplename]) + '\n')
