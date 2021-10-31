@@ -5,6 +5,7 @@ from collections import defaultdict
 supercluster_file_path = sys.argv[1]
 cluster_file_path = sys.argv[2]
 classification_file_path = sys.argv[3]
+samplename =sys.argv[4]
 
 repoutpath = '.'.join(supercluster_file_path.split('.')[:-1]) + '_RepeatSummary.tsv'
 
@@ -40,13 +41,14 @@ with open(repoutpath, 'w') as w:
     # Save header
     w.write('\t'.join(['#Class', 'Order', 'Superfamily', 'Family',
                        'Subfamily1', 'Subamily2', 'Subfamily3',
-                       'Proportion', 'TotalReadNum']) + '\n')
+                       'Proportion', 'TotalReadNum', 'SampleName']) + '\n')
     # Save annotations:
     for k, v in repcount.items():
         annotated = False
         for cl in classif:
-
-            if k == cl[-1]:
+            
+            annot_lvl =  [i for i,el in enumerate(cl) if el == k ]
+            if annot_lvl:
 
                 annotated = True
 
@@ -62,11 +64,11 @@ with open(repoutpath, 'w') as w:
                     res = cl + ['NA']
                 elif len(cl) == 7:
                     res = cl
-                w.write('\t'.join(res + [str(v / totalreadnum)] + [str(totalreadnum)]) +'\n')
+                w.write('\t'.join(res + [str(v / totalreadnum)] + [str(totalreadnum)] + [samplename]) +'\n')
 
         # If not annotated on last level - manually configure:
         if not annotated:
             if k == 'LTR':
-                w.write('\t'.join(['Class_I'] + [k]*6 + [str(v / totalreadnum)] + [str(totalreadnum)]) + '\n')
+                w.write('\t'.join(['Class_I'] + [k]*6 + [str(v / totalreadnum)] + [str(totalreadnum)] + [samplename]) + '\n')
             else:
-                w.write('\t'.join([k]*7 + [str(v / totalreadnum)] + [str(totalreadnum)]) + '\n')
+                w.write('\t'.join([k]*7 + [str(v / totalreadnum)] + [str(totalreadnum)] + [samplename]) + '\n')
