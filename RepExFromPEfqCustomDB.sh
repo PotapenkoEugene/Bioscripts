@@ -4,7 +4,8 @@
 R1=$1
 FRACTION=$2
 CLASS=$3 # file with classification of Viridiplantae3.0 db
-THREADS=$4
+DB=$4
+THREADS=$5
 #############
 
 nameR1=$(basename $R1 .fastq.gz)
@@ -35,7 +36,7 @@ mkdir -p "TEMP_${nameR1}_${FRACTION}" # TEMP dir in cur dir
 
 source ${CONDA_PREFIX}/etc/profile.d/conda.sh
 conda activate singularity
-SINGULARITY_TMPDIR=/mnt/data/eugene/SINGULARITY/tmp SINGULARITY_CACHEDIR=/mnt/data/eugene/SINGULARITY/cache singularity exec -W . --bind ${PWD}:/data/ /mnt/data/eugene/Tools/repex_tarean_latest.sif /bin/bash -c "export TEMP=/data/TEMP_${nameR1}_${FRACTION}; seqclust -tax VIRIDIPLANTAE3.0 -c ${THREADS} -p -C -l /data/REout_${nameR1}_${FRACTION}.log -v /data/REout_${nameR1}_${FRACTION} /data/${nameR1}_${FRACTION}.intervealed.fa"
+SINGULARITY_TMPDIR=/mnt/data/eugene/SINGULARITY/tmp SINGULARITY_CACHEDIR=/mnt/data/eugene/SINGULARITY/cache singularity exec -W . --bind ${PWD}:/data/ /mnt/data/eugene/Tools/repex_tarean_latest.sif /bin/bash -c "export TEMP=/data/TEMP_${nameR1}_${FRACTION}; seqclust -tax VIRIDIPLANTAE3.0 -c ${THREADS} -p -C -l /data/REout_${nameR1}_${FRACTION}.log -v /data/REout_${nameR1}_${FRACTION} -d /data/$DB TrepHordeum /data/${nameR1}_${FRACTION}.intervealed.fa"
 
 rm -r "TEMP_${nameR1}_${FRACTION}"
 rm -r "REout_${nameR1}_${FRACTION}/seqclust"
