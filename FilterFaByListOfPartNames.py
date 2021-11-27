@@ -1,25 +1,26 @@
 import sys
 
 ##################################
-partnames_filepath = sys.argv[1]
+partname = sys.argv[1]
 fasta_filepath = sys.argv[2]
 ##################################
 
-outfile = '.'.join(fasta_filepath.split('.')[:-1]) + '_' +\
-          '.'.join(partnames_filepath.split('.')[:-1]) + '.fa'
+outfile = '.'.join(fasta_filepath.split('.')[:-1]) + '_' + partname + '.fa'
 
-with open(partnames_filepath) as partnames_file, \
-     open(fasta_filepath) as fasta_file, \
+with open(fasta_filepath) as fasta_file, \
      open(outfile, 'w') as w:
 
     block = True
-    names = partnames_file.readlines()
+    print(f'INFO:\tSearch fasta records containing this stings:\n{partname}')
 
     for line in fasta_file:
         if line.startswith('>'):
 
-            check = [line for name in names if name.strip() and name.strip() in line]
+            print(f'INFO:\tSearch in {line}')
+            check = partname.strip() in line
+
             if check:
+                print(f'INFO:\tSuccess')
                 w.write(line)
                 block = False
             else:
