@@ -9,10 +9,14 @@ samplename = sys.argv[4]
 
 repoutpath = '.'.join(supercluster_file_path.split('.')[:-1]) + '_RepeatSummary.tsv'
 
+
 # Create dicts
 repcount = defaultdict(int)
+# Load classification file
+with open(classification_file_path) as f:
+    classif = [i.rstrip('\n').replace('/', '_').split() for i in f.readlines()]
 
-# Run on Super cluster output file of RepeatExplorer2
+# Count read number on each SuperCluster (output file of RepeatExplorer2)
 with open(supercluster_file_path) as f:
     for line in f:
         if line.startswith('-'):
@@ -23,9 +27,6 @@ with open(supercluster_file_path) as f:
             # Count each Super cluster:
             repcount[line_splt[2].strip('\"')] += int(line_splt[1])
 
-with open(classification_file_path) as f:
-    classif = [i.rstrip('\n').replace('/', '_').split('\t') for i in f.readlines()]
-
 # open CLUSTER TABLE for total read number:
 with open(cluster_file_path) as f:
     commentlines = []
@@ -35,6 +36,7 @@ with open(cluster_file_path) as f:
         if line.strip('\"').startswith('Number_of_analyzed_reads'):
             totalreadnum = int(line.strip('\"').split('\t')[1])
 
+# Calculate and write out file
 with open(repoutpath, 'w') as w:
     # Save comments
     [w.write(line) for line in commentlines]
@@ -42,29 +44,47 @@ with open(repoutpath, 'w') as w:
     w.write('\t'.join(['#Class', 'Order', 'Superfamily', 'Family',
                        'Subfamily1', 'Subamily2', 'Subfamily3',
                        'Proportion', 'TotalReadNum', 'SampleName']) + '\n')
+
     # Save annotations:
+
     for k, v in repcount.items():
         annotated = False
-        last_annot_lvl = (0, None)
 
+        # case one it's the lates annotation level
         for cl in classif:
 
-            # find on what level of annotation
-            annot_lvl = [i for i, el in enumerate(cl) if el == k]
-            # change level of annotation if annotated deeper
-            if annot_lvl:
-                if annot_lvl[0] > last_annot_lvl[0]:
-                    last_annot_lvl = (annot_lvl[0], cl)
+            if k == cl[-1]:
                 annotated = True
+                cl_na = cl + ['NA'] * ( 7 - len(cl) )
+                record = (cl_na, v)
+                break
 
-        if annotated:
-
-            lvl = last_annot_lvl[0]
-            cl = last_annot_lvl[1]
-
-            res = cl[:lvl+1] + ['NA'] * (7-lvl-1)
-            w.write('\t'.join(res + [str(v / totalreadnum)] + [str(totalreadnum)] + [samplename]) + '\n')
-
-        # If not annotated on last level - manually configure:
         if not annotated:
-            w.write('\t'.join([k] * 7 + [str(v / totalreadnum)] + [str(totalreadnum)] + [samplename]) + '\n')
+            # case two it's the first annotation level
+            for cl in classif:
+
+                if k == cl[0]:
+                    annotated = True
+                    cl_na = [cl[0]] + ['NA']*6
+                    record = (cl_na, v)
+                    break
+
+        if not annotated:
+
+            # case three it's the middle annotation level
+            for cl in classif:
+
+                if k in cl and k != cl[0] and k != cl[-1]:
+                    annotated = True
+                    cl_na = cl[:cl.index(k) + 1] + ['NA'] * (7 - len(cl[:cl.index(k) + 1]))
+                    record = (cl_na, v)
+                    break
+
+        if not annotated:
+
+            # case four - name not in TE classification file (not TE)
+            record = ([k]*7, v)
+
+        w.write('\t'.join(record[0]) + '\t' + '\t'.join([str(v / totalreadnum),
+                                                         str(totalreadnum),
+                                                         samplename]) + '\n')
