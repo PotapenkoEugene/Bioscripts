@@ -78,8 +78,10 @@ with open(repoutpath, 'w') as w:
 
                 if k in cl and k != cl[0] and k != cl[-1]:
                     annotated = True
+                    lvl = cl.index(k)
                     cl = [cl[i] if i == 0 else '/'.join(cl[:i+1]) for i in range(len(cl))]
-                    cl_na = cl[:cl.index(k) + 1] + [k] * (7 - len(cl[:cl.index(k) + 1]))
+
+                    cl_na = cl[:lvl + 1] + [k] * (7 - len(cl[:lvl + 1]))
                     record = (cl_na, v)
                     break
 
