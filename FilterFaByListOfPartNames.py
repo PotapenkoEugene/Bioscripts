@@ -1,11 +1,11 @@
 import sys
 
 ##################################
-partname = sys.argv[1]
-fasta_filepath = sys.argv[2]
+fasta_filepath = sys.argv[1]
+partname = sys.argv[2].strip().split(',')  # names separated by comma
 ##################################
 
-outfile = '.'.join(fasta_filepath.split('.')[:-1]) + '_' + partname + '.fa'
+outfile = '.'.join(fasta_filepath.split('.')[:-1]) + '_' + '-'.join(partname) + '.fa'
 
 with open(fasta_filepath) as fasta_file, \
      open(outfile, 'w') as w:
@@ -17,7 +17,7 @@ with open(fasta_filepath) as fasta_file, \
         if line.startswith('>'):
 
             print(f'INFO:\tSearch in {line}')
-            check = partname.strip() in line
+            check = sum([1 for i in partname if i in line]) == len(partname)
 
             if check:
                 print(f'INFO:\tSuccess')

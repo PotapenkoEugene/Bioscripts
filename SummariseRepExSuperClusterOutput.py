@@ -9,7 +9,6 @@ samplename = sys.argv[4]
 
 repoutpath = '.'.join(supercluster_file_path.split('.')[:-1]) + '_RepeatSummary.tsv'
 
-
 # Create dicts
 repcount = defaultdict(int)
 # Load classification file
