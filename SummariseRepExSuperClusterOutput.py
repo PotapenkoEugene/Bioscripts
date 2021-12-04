@@ -53,8 +53,9 @@ with open(repoutpath, 'w') as w:
         for cl in classif:
 
             if k == cl[-1]:
+                cl = [cl[i] if i == 0 else '/'.join(cl[:i+1]) for i in range(len(cl))]
                 annotated = True
-                cl_na = cl + ['NA'] * ( 7 - len(cl) )
+                cl_na = cl + [cl[-1]] * ( 7 - len(cl) )
                 record = (cl_na, v)
                 break
 
@@ -64,7 +65,8 @@ with open(repoutpath, 'w') as w:
 
                 if k == cl[0]:
                     annotated = True
-                    cl_na = [cl[0]] + ['NA']*6
+                    cl = [cl[i] if i == 0 else '/'.join(cl[:i+1]) for i in range(len(cl))]
+                    cl_na = [cl[0]] + [cl[0]]*6
                     record = (cl_na, v)
                     break
 
@@ -75,7 +77,10 @@ with open(repoutpath, 'w') as w:
 
                 if k in cl and k != cl[0] and k != cl[-1]:
                     annotated = True
-                    cl_na = cl[:cl.index(k) + 1] + ['NA'] * (7 - len(cl[:cl.index(k) + 1]))
+                    lvl = cl.index(k)
+                    cl = [cl[i] if i == 0 else '/'.join(cl[:i+1]) for i in range(len(cl))]
+
+                    cl_na = cl[:lvl + 1] + [k] * (7 - len(cl[:lvl + 1]))
                     record = (cl_na, v)
                     break
 
