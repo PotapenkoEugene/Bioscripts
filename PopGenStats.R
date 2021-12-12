@@ -45,7 +45,70 @@ snp$pop <-  as.factor(substr(row.names(snp$tab), 1,2))
 locmiss_snp = propTyped(snp, by = 'loc')
 print(paste0('INFO:    The percentage of uncomplete genotypes per loci(<0.80):    ', locmiss_snp[which(locmiss_snp < 0.80)]))
 # Remove loci with a lot of miss data
-snp = missingno(snp, type='loci', cuttof=0.20)
+snp = missingno(snp, type='loci', cutoff=0.20)
+# Remove ind with a lot of miss data
+snp = missingno(snp, type='geno', cutoff=0.20)
+
+## Check genotypes are unique
+# Print the number of multilocus genotypes
+mlg(snp)
+# Identify duplicated genotypes.
+dups_snps = mlg.id(snp)
+print('INFO:    Remove duplicated individuals:')
+dupls = c()
+for (i in dups_snps){ # for each element in the list object
+  if (length(dups_snps[i]) > 1){ # if the length is greater than 1
+    dupls = c(dupls, i)
+    }
+}
+
+# Remove duplicated genotypes.
+# Create a vector of individual names without the duplicates
+snp_Nodups = indNames(snp)[! indNames(snp) %in% dupls]
+# Create a new genind object without the duplicates
+snp = snp[snp_Nodups, ]
+mlg(snp)
+
+
+## **Check loci are still polymorphic after filtering**
+print('INFO:    Check loci that polymorphic')
+isPoly(snp) %>% summary
+
+print('INFO:    Remove loci that are not polymorphic.')
+poly_loci = names(which(isPoly(snp) == TRUE))
+snp = snp[loc = poly_loci]
+
+print('INFO:    Check loci that polymorphic again')
+isPoly(snp) %>% summary
+
+print('INFO:    Summary statistics')
+print('INFO:    Mean allelic richness per site across all loci')
+allelic.richness(genind2hierfstat(snp))$Ar %>%
+  apply(MARGIN = 2, FUN = mean) %>% 
+  round(digits = 3)
+
+print('INFO:    Calculate heterozygosity per site')
+# Calculate basic stats using hierfstat
+basic_snp = basic.stats(snp, diploid = TRUE)
+# Mean observed heterozygosity per site
+Ho = apply(basic_snp$Ho, MARGIN = 2, FUN = mean, na.rm = TRUE)
+Ho
+
+print('INFO:    Mean expected heterozygosity per site')
+He = apply(basic_snp$Hs, MARGIN = 2, FUN = mean, na.rm = TRUE) %>% round(digits=3)
+He
+
+print('INFO:    Inbreeding coefficient (FIS)')
+print('INFO:    Calculate mean FIS per site')
+apply(basic_snp$Fis, MARGIN = 2, FUN = mean, na.rm = TRUE) %>%
+  round(digits = 3)
+
+print('INFO:    Compute pairwise FST (Weir & Cockerham 1984).')
+fst = genet.dist(snp, method = "Fst")
+fst %>% round(digits = 3)
+
+
+
 
 
 
