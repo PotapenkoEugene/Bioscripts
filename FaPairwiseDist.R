@@ -1,0 +1,54 @@
+r = getOption("repos")
+r["CRAN"] = "http://cran.us.r-project.org"
+options(repos = r)
+############################################################################
+if (!requireNamespace("seqinr", quietly = TRUE)) install.packages("seqinr")
+if (!requireNamespace("ggplot2", quietly = TRUE)) install.packages("ggplot2")
+
+library(seqinr)
+library(ggplot2)
+# #############################################################################
+args = commandArgs(trailingOnly=TRUE)
+# test if there is at least one argument: if not, return an error
+if (length(args)==0) {
+  stop("At least one argument must be supplied (input file).n", call.=FALSE)
+} else if (length(args)==1) {
+  # default output file
+  args[2] = "out"
+}
+
+path = args[1]
+outpath = args[2]
+
+#############################################################################
+myseqs <- read.alignment(path, format = "fasta")
+mat <- dist.alignment(myseqs, matrix = "identity")
+# Save DISTANCE matrix
+out = paste0(outpath, '_DistMatrix.tsv')
+write.table(as.matrix(mat), out, quote = FALSE, sep='\t')
+#############################################################################
+# Make PcoA from dist matrix
+# Use Stat Quest pipeline: https://www.youtube.com/watch?v=pGAUHhLYp5Q
+mds <- cmdscale(mat, eig=T, x.ret=T)
+mds.var.per = round(mds$eig / sum(mds$eig)*100, 1)
+# Format pca data for plotting
+mds.values = mds$points
+mds.data = data.frame(Sample = rownames(mds.values), 
+                      X = mds.values[,1], # PC1 and PC2
+                      Y = mds.values[,2])
+
+# Make graph 
+spec = sub('(.*)-[0-9]+.*', '\\1', mds.data$Sample)
+tk = sub('.*-([0-9]+)_K.*', '\\1', mds.data$Sample)
+kinpos = sub(".*_(K[12]){1}.*", "\\1", mds.data$Sample)
+mds.data$Species = spec
+mds.data$TK = tk
+mds.data$KinPos = kinpos
+
+out = paste0(outpath, '_MDSplor.png')
+png(file=out, width = 800, height = 600)
+
+ggplot(mds.data) +
+  geom_point(aes(X,Y, color = Species, shape = KinPos), size = 5)
+
+dev.off()
