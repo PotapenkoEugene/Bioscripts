@@ -46,7 +46,7 @@ mds.data$TK = tk
 mds.data$KinPos = kinpos
 
 out = paste0(outpath, '_MDSplor.png')
-png(file=out, width = 800, height = 600)
+png(file=out, width = 2400, height = 1200)
 
 ggplot(mds.data) +
   geom_point(aes(X,Y, color = Species, shape = KinPos), size = 5)
