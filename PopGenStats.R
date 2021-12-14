@@ -32,8 +32,8 @@ if (length(args)==0) {
 }
 path = args[1]
 outpath = args[2]
-
-vcf <- read.vcfR(path, verbose = FALSE)
+?vcfR::read.vcfR
+vcf <- read.vcfR(path, verbose = FALSE, limit = 1.2e+11) # limit on hive server based 120gb
 snp <- vcfR2genind(vcf)
 
 # Population have to be specified in that format: POP_IND
