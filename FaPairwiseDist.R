@@ -49,6 +49,6 @@ out = paste0(outpath, '_MDSplor.png')
 png(file=out, width = 2400, height = 1200)
 
 ggplot(mds.data) +
-  geom_point(aes(X,Y, color = Species, shape = KinPos), size = 5)
+  geom_point(aes(X,Y, shape = KinPos), size = 5)
 
 dev.off()
