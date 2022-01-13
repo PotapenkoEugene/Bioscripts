@@ -25,8 +25,8 @@ if __name__ == "__main__":
     # OPTIONAL
     parser.add_argument('--number', type=float,
                         help="""Specified the X for some options""")
-    parser.add_argument('--format', type=str,
-                        help="Choose tsv/csv/xls extension, tsv by default")
+    parser.add_argument('--sep', type=str,
+                        help="Specified separator symbol, \t by default")
     parser.add_argument('--header', type=str,
                         help="+/-, default is +")
 
@@ -44,8 +44,8 @@ if __name__ == "__main__":
             exit(1)
 
     # Check FORMAT arg
-    if args['format']:
-        sep = args['format']
+    if args['sep']:
+        sep = args['sep']
     else:
         sep = '\t'
 
