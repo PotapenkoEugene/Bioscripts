@@ -23,7 +23,7 @@ if __name__ == "__main__":
                         help="Which column use for filter, number from 1 to ...")
 
     # OPTIONAL
-    parser.add_argument('--number', type=int,
+    parser.add_argument('--number', type=float,
                         help="""Specified the X for some options""")
     parser.add_argument('--format', type=str,
                         help="Choose tsv/csv/xls extension, tsv by default")
