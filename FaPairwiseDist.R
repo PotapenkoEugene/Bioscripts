@@ -24,6 +24,7 @@ outpath = args[2]
 #############################################################################
 myseqs <- read.alignment(path, format = "fasta")
 mat <- dist.alignment(myseqs, matrix = "identity")
+
 # Save DISTANCE matrix
 out = paste0(outpath, '_DistMatrix.tsv')
 write.table(as.matrix(mat), out, quote = FALSE, sep='\t')
@@ -31,8 +32,7 @@ write.table(as.matrix(mat), out, quote = FALSE, sep='\t')
 
 # Make PcoA from dist matrix
 # Use Stat Quest pipeline: https://www.youtube.com/watch?v=pGAUHhLYp5Q
-matna = na.omit(mat)
-mds <- cmdscale(matna, eig=T, x.ret=T)
+mds <- cmdscale(mat, eig=T, x.ret=T)
 mds.var.per = round(mds$eig / sum(mds$eig)*100, 1)
 # Format pca data for plotting
 mds.values = mds$points
