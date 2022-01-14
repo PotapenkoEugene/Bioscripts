@@ -31,7 +31,8 @@ write.table(as.matrix(mat), out, quote = FALSE, sep='\t')
 
 # Make PcoA from dist matrix
 # Use Stat Quest pipeline: https://www.youtube.com/watch?v=pGAUHhLYp5Q
-mds <- cmdscale(mat, eig=T, x.ret=T)
+matna = na.omit(mat)
+mds <- cmdscale(matna, eig=T, x.ret=T)
 mds.var.per = round(mds$eig / sum(mds$eig)*100, 1)
 # Format pca data for plotting
 mds.values = mds$points
