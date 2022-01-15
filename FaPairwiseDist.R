@@ -40,10 +40,11 @@ mds.data = data.frame(Sample = rownames(mds.values),
                       X = mds.values[,1], # PC1 and PC2
                       Y = mds.values[,2])
 
+# B_ceiba-49108_K2_d_RLK-Pelle_DLSV_Pseudo
 # Make graph  (I'm a GOD of regex!)
 mds.data$Species = sub('(.*)-[0-9]+.*', '\\1', mds.data$Sample)
 mds.data$TK = sub('.*-([0-9]+)_K.*', '\\1', mds.data$Sample)
-mds.data$KinPos = sub(".*_(K[12]){1}.*", "\\1", mds.data$Sample)
+mds.data$KinPos = sub(".*_.*_(K[0-9])_.*", "\\1", mds.data$Sample)
 mds.data$Pseudo = sub('[^_]*_[^_]*_[^_]*_[^_]*_[^_]*_[^_]*_([A-Z]*)', '\\1', mds.data$Sample)
 
 out = paste0(outpath, '_MDSplor.png')
