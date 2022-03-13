@@ -14,7 +14,7 @@ with open(DOMAINPOS) as f_pos, open(OUT, 'w') as w:
             start, end = map(int, line.split('\t')[1:3])
             if seq.id == name:
                 count += 1
-                w.write(seq.id+'_K'+str(count) + '\n' + str(seq.seq[start:end+1]) + '\n')
+                w.write('>'+ seq.id+'_K'+str(count) + '\n' + str(seq.seq[start:end+1]) + '\n')
         f_pos.seek(0)
 
 
