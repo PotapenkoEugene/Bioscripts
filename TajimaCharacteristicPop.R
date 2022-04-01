@@ -10,5 +10,5 @@ vcf <- read.vcfR(VCF)
 vcf.bin <- vcfR2DNAbin(vcf)
 tajima <- tajima.test(vcf.bin)
 out = paste0(POP, '\t', tajima$D, '\t', tajima$Pval.normal, '\t', tajima$Pval.beta)
-write.tsv(out, paste0(POP,'.tsv'), header = F, row.names =F)
+writeLines(out, paste0(POP,'.tsv'))
 
