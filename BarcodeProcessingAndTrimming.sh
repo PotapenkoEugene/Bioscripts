@@ -4,7 +4,7 @@
 #####################
 R1=$1 # ChIPSeq_ES_2_CGATGT_L001_R1_001.fastq
 R2=$2 # ChIPSeq_ES_2_CGATGT_L001_R2_001.fastq
-BARCODES=$3 # NAME1 BARCODE1 (.tsv)
+BARCODES=$(realpath $3) # NAME1 BARCODE1 (.tsv)
 MISMATCH=$4 # 5 norm!
 
 CPU=$5
@@ -37,8 +37,8 @@ mkdir BarSplitR1 BarSplitR2
 if test -f "BarSplitR1/${BARCODE1}_R1.fastq"; then
 	echo "Barcodes already splitted - SKIP BARCODESPLITTER"
 else
-(echo "zcat $R1trim | BarcodeSplitter --bcfile ../${BARCODES} --bol --mismatches $MISMATCH --prefix BarSplitR1/ --suffix "_R1.fastq" --debug"
- echo "zcat $R2trim | BarcodeSplitter --bcfile ../${BARCODES} --bol --mismatches $MISMATCH --prefix BarSplitR2/ --suffix "_R2.fastq" --debug") | parallel
+(echo "zcat $R1trim | BarcodeSplitter --bcfile ${BARCODES} --bol --mismatches $MISMATCH --prefix BarSplitR1/ --suffix "_R1.fastq" --debug"
+ echo "zcat $R2trim | BarcodeSplitter --bcfile ${BARCODES} --bol --mismatches $MISMATCH --prefix BarSplitR2/ --suffix "_R2.fastq" --debug") | parallel
 fi
 
 conda activate fastq-pair # ! NEED fastq-pair conda enviroment with fastq_pair tool installed
