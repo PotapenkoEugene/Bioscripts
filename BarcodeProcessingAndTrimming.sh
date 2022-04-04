@@ -31,7 +31,15 @@ cd trim
 
 # BarcodeSplit
 mkdir BarSplitR1 BarSplitR2
-
+if test -f "BarSplitR1/unmatched_R1.fastq"; then
+	echo "Barcodes already splitted - SKIP BARCODESPLITTER"
+else
 (echo "zcat $R1trim | BarcodeSplitter --bcfile ../${BARCODES} --bol --mismatches $MISMATCH --prefix BarSplitR1/ --suffix "_R1.fastq" --debug"
  echo "zcat $R2trim | BarcodeSplitter --bcfile ../${BARCODES} --bol --mismatches $MISMATCH --prefix BarSplitR2/ --suffix "_R2.fastq" --debug") | parallel
+fi
 
+conda activate fastq-pair # ! NEED fastq-pair conda enviroment with fastq_pair tool installed
+for barcode in `cat $BARCODES | cut -f1`
+	do
+	fastq_pair BarSplitR1/${barcode}_R1.fastq BarSplitR2/${barcode}_R2.fastq && rm BarSplitR1/${barcode}_R1.fastq BarSplitR2/${barcode}_R2.fastq
+	done
