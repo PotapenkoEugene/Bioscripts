@@ -29,6 +29,6 @@ R1=${R1name}.trim.fastq.gz
 R2=${R2name}.trim.fastq.gz
 
 # BarcodeSplit
-zcat $R1 | BarcodeSplitter --bcfile $BARCODES --bol --mismatch $MISMATCH --prefix BarSplitR1/ --suffix "_R1.fastq"
-zcat $R2 | BarcodeSplitter --bcfile $BARCODES --bol --mismatch $MISMATCH --prefix BarSplitR2/ --suffix "_R2.fastq"
+zcat $R1 | BarcodeSplitter --bcfile ../${BARCODES} --bol --mismatch $MISMATCH --prefix BarSplitR1/ --suffix "_R1.fastq"
+zcat $R2 | BarcodeSplitter --bcfile ../${BARCODES} --bol --mismatch $MISMATCH --prefix BarSplitR2/ --suffix "_R2.fastq"
 
