@@ -15,17 +15,20 @@ R2name=${R2%%.*}
 mkdir QC trim
 
 # QC raw reads
-fastqc $R1 $R2 -t $CPU -o QC
+#fastqc $R1 $R2 -t $CPU -o QC
 
 # Trim first NNN
-fastp -w $CPU -f 3 -i $R1 -I $R2 -o trim/${R1name}.trim.fastq.gz -O trim/${R2name}.trim.fastq.gz
+if test -f "trim/${R1name}.trim.fastq.gz"; then
+	echo "File trim/${R1name}.trim.fastq.gz already exist - SKIP TRIMMING"
+else
+	fastp -w $CPU -f 3 -i $R1 -I $R2 -o trim/${R1name}.trim.fastq.gz -O trim/${R2name}.trim.fastq.gz
+fi
 
 cd trim
 R1=${R1name}.trim.fastq.gz
 R2=${R2name}.trim.fastq.gz
 
 # BarcodeSplit
-
-zcat $R1 | BarcodeSplitter --bcfile $BARCODES --bol --mismatch $MISMATCH --prefix BarSplitR1/ --suffix ".fastq"
-zcat $R2 | BarcodeSplitter --bcfile $BARCODES --bol --mismatch $MISMATCH --prefix BarSplitR2/ --suffix ".fastq"
+zcat $R1 | BarcodeSplitter --bcfile $BARCODES --bol --mismatch $MISMATCH --prefix BarSplitR1/ --suffix "_R1.fastq"
+zcat $R2 | BarcodeSplitter --bcfile $BARCODES --bol --mismatch $MISMATCH --prefix BarSplitR2/ --suffix "_R2.fastq"
 
