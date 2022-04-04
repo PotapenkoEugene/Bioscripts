@@ -8,6 +8,7 @@ BARCODES=$3 # NAME1 BARCODE1 (.tsv)
 MISMATCH=$4 # 5 norm!
 
 CPU=$5
+source ${CONDA_PREFIX}/etc/profile.d/conda.sh
 #####################
 
 R1name=${R1%%.*}
