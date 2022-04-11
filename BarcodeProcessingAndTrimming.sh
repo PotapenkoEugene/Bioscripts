@@ -6,8 +6,9 @@ R1=$1 # ChIPSeq_ES_2_CGATGT_L001_R1_001.fastq
 R2=$2 # ChIPSeq_ES_2_CGATGT_L001_R2_001.fastq
 BARCODES=$(realpath $3) # NAME1 BARCODE1 (.tsv)
 MISMATCH=$4 # 5 norm!
+BOWTIEINDEX=$(realpath $5)
 
-CPU=$5
+CPU=$6
 source ${CONDA_PREFIX}/etc/profile.d/conda.sh
 #####################
 
@@ -32,9 +33,12 @@ fi
 
 cd trim
 
+###################################
+#TODO We delete file that check for BarSplit step, ADD ANOTHER CHECK
+##################################
 ### BarcodeSpliter ###
 mkdir BarSplitR1 BarSplitR2
-if test -f "BarSplitR1/${BARCODE1}_R1.fastq"; then
+if test -f "BarSplitR1/${BARCODE1}_R1.fastq"; then 
 	echo "Barcodes already splitted - SKIP BARCODESPLITTER"
 else
 (echo "zcat $R1trim | BarcodeSplitter --bcfile ${BARCODES} --bol --mismatches $MISMATCH --prefix BarSplitR1/ --suffix "_R1.fastq" --debug"
@@ -45,6 +49,7 @@ fi
 conda activate fastq-pair # ! NEED fastq-pair conda enviroment with fastq_pair tool installed
 rm BarSplitR1/unmatched_R1.fastq BarSplitR2/unmatched_R2.fastq
 
+mkdir alignments QC
 for barcode in `cat $BARCODES | cut -f1`
 	do
 	
@@ -61,8 +66,20 @@ for barcode in `cat $BARCODES | cut -f1`
 		echo "Barcodes already trimmed - SKIP BARCODE TRIMMING"
 	
 	else	
-		fastp -w $CPU -f 22 -i BarSplitR1/${barcode}_R1.fastq.paired.fq -I BarSplitR1/${barcode}_R2.fastq.paired.fq -o ${barcode}_R1.trim.fq.gz -O ${barcode}_R2.trim.fq.gz
+		fastp -w $CPU -f 22 -i BarSplitR1/${barcode}_R1.fastq.paired.fq -I BarSplitR2/${barcode}_R2.fastq.paired.fq -o ${barcode}_R1.trim.fq.gz -O ${barcode}_R2.trim.fq.gz
 
+	fi
+
+	### FASTQC
+	#fastqc $R1 $R2 -t $CPU -o QC
+
+	### ALIGNMENT
+	if test -f "alignments/${barcode}.sam"; then
+		echo "${barcode} already aligned to the genome - SKIP ALIGNING"
+
+	else	
+		bowtie2 --threads $CPU -x $BOWTIEINDEX -1 ${barcode}_R1.trim.fq.gz -2 ${barcode}_R2.trim.fq.gz | samtools view -b - > alignments/${barcode}.sam
+	
 	fi
 
 	done
