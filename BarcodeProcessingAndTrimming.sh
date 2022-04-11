@@ -9,6 +9,7 @@ MISMATCH=$4 # 5 norm!
 BOWTIEINDEX=$(realpath $5)
 
 CPU=$6
+RAM=$7
 source ${CONDA_PREFIX}/etc/profile.d/conda.sh
 #####################
 
@@ -68,18 +69,33 @@ for barcode in `cat $BARCODES | cut -f1`
 	else	
 		fastp -w $CPU -f 22 -i BarSplitR1/${barcode}_R1.fastq.paired.fq -I BarSplitR2/${barcode}_R2.fastq.paired.fq -o ${barcode}_R1.trim.fq.gz -O ${barcode}_R2.trim.fq.gz
 
+		cat BarSplitR1/${barcode}_R1.fastq.single.fq BarSplitR2/${barcode}_R2.fastq.single.fq > ${barcode}_single.fq && rm BarSplitR1/${barcode}_R1.fastq.single.fq BarSplitR2/${barcode}_R2.fastq.single.fq
+
+		fastp -w $CPU -f 22 -i ${barcode}_single.fq  -o ${barcode}_single.trim.fq.gz
 	fi
 
 	### FASTQC
 	#fastqc $R1 $R2 -t $CPU -o QC
 
 	### ALIGNMENT
-	if test -f "alignments/${barcode}.sam"; then
+	if test -f "alignments/${barcode}.bam"; then
 		echo "${barcode} already aligned to the genome - SKIP ALIGNING"
 
-	else	
-		bowtie2 --threads $CPU -x $BOWTIEINDEX -1 ${barcode}_R1.trim.fq.gz -2 ${barcode}_R2.trim.fq.gz | samtools view -b - > alignments/${barcode}.sam
-	
+	else
+		bowtie2 --threads $CPU -x $BOWTIEINDEX -1 ${barcode}_R1.trim.fq.gz -2 ${barcode}_R2.trim.fq.gz -U ${barcode}_single.trim.fq.gz |samtools sort -@ ${CPU} | samtools view -b - > alignments/${barcode}.bam
+		samtools flagstat -@ $CPU alignments/${barcode}.bam > alignments/${barcode}.flagstat
 	fi
+	
+
+	### DUPLICATES
+#	if test -f #TODO
+
+	conda activate picard
+	export _JAVA_OPTIONS="${RAM}"
+
+	picard MarkDuplicates I=alignments/${barcode}.bam O=alignments/${barcode}.MD.bam M=alignments/${barcode}.MD_metrics
+
+	### MACS2 peak calling
+	#TODO	
 
 	done
