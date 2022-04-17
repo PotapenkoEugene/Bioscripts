@@ -88,14 +88,15 @@ for barcode in `cat $BARCODES | cut -f1`
 	
 
 	### DUPLICATES
-#	if test -f #TODO
+	if test -f "alignments/${barcode}.MD.bam"; then
+		echo "Duplicates in ${barcode} sample already marked - SKIP MARKING DUPLICATES" 
 
-	conda activate picard
-	export _JAVA_OPTIONS="${RAM}"
+	else
+		conda activate picard
+		export _JAVA_OPTIONS="${RAM}"
 
-	picard MarkDuplicates I=alignments/${barcode}.bam O=alignments/${barcode}.MD.bam M=alignments/${barcode}.MD_metrics
+		picard MarkDuplicates I=alignments/${barcode}.bam O=alignments/${barcode}.MD.bam M=alignments/${barcode}.MD_metrics
+	fi
 
-	### MACS2 peak calling
-	#TODO	
-
-	done
+	echo "FINISH ${barcode} sample"
+	done 
