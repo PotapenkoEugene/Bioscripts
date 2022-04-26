@@ -9,6 +9,7 @@ STEPSIZE=$4 # 10 (kb)
 MAF=$5 # 0.01
 NE=20000000 # effective population size
 MEM=$6
+source ${CONDA_PREFIX}/etc/profile.d/conda.sh
 ################################
 
 NAME=$(basename $VCFGZ .vcf.gz)
