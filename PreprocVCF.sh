@@ -19,4 +19,4 @@ mkdir FILTRED
 bcftools view --threads 20 -S $SAMPLES $VCFGZ -Oz -o $SUBSET
 
 # FILTER by LD and MAF
-bcftools +prune -l $LD -e"MAF<=${MAF}" $SUBSET -Oz -o $LDMAF
+bcftools +prune -m $LD -e"MAF<=${MAF}" $SUBSET -Oz -o $LDMAF
