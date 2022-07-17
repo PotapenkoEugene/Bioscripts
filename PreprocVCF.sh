@@ -1,4 +1,8 @@
 #!/bin/bash
+source ${CONDA_PREFIX}/etc/profile.d/conda.sh
+
+# bcftools conda enviroment required 
+conda activate bcftools
 
 # INPUT
 VCFGZ=$1 ; name=$(basename $VCFGZ .vcf.gz)
@@ -15,4 +19,4 @@ mkdir FILTRED
 bcftools view --threads 20 -S $SAMPLES $VCFGZ -Oz -o $SUBSET
 
 # FILTER by LD and MAF
-bcftools +prune -l $LD -e'MAF<=0.05' $SUBSET -Oz -o $LDMAF
+bcftools +prune -l $LD -e"MAF<=${MAF}" $SUBSET -Oz -o $LDMAF
