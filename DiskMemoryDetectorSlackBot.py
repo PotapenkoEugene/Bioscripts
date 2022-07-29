@@ -7,15 +7,26 @@ import datetime
 import sys
 
 
-##################
-URL = sys.argv[1]  # test URL
-targetDevice = sys.argv[2]  # '/dev/nvme0n1p4'
-warningFreq = 3600
-warningRange = range(80, 85)
-warningExtremeFreq = 1800
-warningExtremeRange = range(85, 90)
-detectorFreq = 3600
-nightTime = list(range(11)) + list(range(20, 25)) # from 20 to 10 hour is NIGHT
+####### Args ##########
+# 1 URL
+# 2 target device, example: /dev/nvme0n1p4
+# 3 warning Frequency - 3600
+# 4 warning Range start
+# 5 warning Range end
+# 6 - warning Extreme Frequency - 1800
+# 7 - warning Extreme Range start
+# 8 - warning Extreme Range end
+# 9 - detector frequency - 3600
+#######################
+
+URL = sys.argv[1]
+targetDevice = sys.argv[2]
+warningFreq = int(sys.argv[3])
+warningRange = range(int(sys.argv[4]), int(sys.argv[5]))
+warningExtremeFreq = int(sys.argv[6])
+warningExtremeRange = range(int(sys.argv[7]), int(sys.argv[8]))
+detectorFreq = int(sys.argv[9])
+nightTime = list(range(11)) + list(range(20, 25))  # from 20 to 10 hour is NIGHT
 #################
 
 while True:
