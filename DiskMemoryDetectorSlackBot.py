@@ -7,7 +7,9 @@ import time
 ##################
 targetDevice = '/dev/nvme0n1p4'
 URL = "https://hooks.slack.com/services/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"
-
+warningFreq = 3600
+warningExtremeFreq = 1800
+detectorFreq = 3600
 ##################
 
 while True:
@@ -18,17 +20,22 @@ while True:
     usage, dir = [dev for dev in output.decode('utf-8').split('\n') if
                      dev.startswith(targetDevice)][0].split()[4:6]
 
-    bashCommand = f"curl -X POST -H \"Content-type:application/json\" --data \"{{\'text\':\'{message}\'}}\" {URL}"
 
-    if int(usage.rstrip('%')) in range(80-85):
+
+    if int(usage.rstrip('%')) in range(80,85):
         message = f"Disk space has reached {usage}. Clear some space in {dir}."
+        bashCommand = f"curl -X POST -H \"Content-type:application/json\" --data \"{{\'text\':\'{message}\'}}\" {URL}"
         os.system(bashCommand)
+        time.sleep(warningFreq)
+        continue
 
-    elif int(usage.rstrip('%')) in range(85-90):
-        message = f"Disk space has reached {usage}. Clear some space in {dir}."
+    elif int(usage.rstrip('%')) in range(85,96):
+        message = f"Disk space has reached {usage}. !!! Immediately !!! clear some space in {dir}."
+        bashCommand = f"curl -X POST -H \"Content-type:application/json\" --data \"{{\'text\':\'{message}\'}}\" {URL}"
         os.system(bashCommand)
-        time.sleep(1800)
+        time.sleep(warningExtremeFreq)
+        continue
 
-    time.sleep(3600)
+    time.sleep(detectorFreq)
 
 
