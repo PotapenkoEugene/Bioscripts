@@ -6,7 +6,7 @@ import time
 import sys
 
 ##################
-URL = sys.argv[1]  # test URL https://hooks.slack.com/services/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
+URL = sys.argv[1]  # test URL
 targetDevice = '/dev/nvme0n1p4'
 warningFreq = 3600
 warningExtremeFreq = 1800
