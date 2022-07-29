@@ -3,10 +3,11 @@
 import subprocess
 import os
 import time
+import sys
 
 ##################
+URL = sys.argv[1]  # test URL https://hooks.slack.com/services/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
 targetDevice = '/dev/nvme0n1p4'
-URL = "https://hooks.slack.com/services/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"
 warningFreq = 3600
 warningExtremeFreq = 1800
 detectorFreq = 3600
@@ -23,14 +24,14 @@ while True:
 
 
     if int(usage.rstrip('%')) in range(80,85):
-        message = f"Disk space has reached {usage}. Clear some space in {dir}."
+        message = f"Disk space has reached *{usage}*.\nClear some space in {dir}."
         bashCommand = f"curl -X POST -H \"Content-type:application/json\" --data \"{{\'text\':\'{message}\'}}\" {URL}"
         os.system(bashCommand)
         time.sleep(warningFreq)
         continue
 
     elif int(usage.rstrip('%')) in range(85,96):
-        message = f"Disk space has reached {usage}. !!! Immediately !!! clear some space in {dir}."
+        message = f"Disk space has reached *{usage}*.\n*!!! Immediately !!!* clear some space in {dir}."
         bashCommand = f"curl -X POST -H \"Content-type:application/json\" --data \"{{\'text\':\'{message}\'}}\" {URL}"
         os.system(bashCommand)
         time.sleep(warningExtremeFreq)
