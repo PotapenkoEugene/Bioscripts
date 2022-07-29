@@ -7,11 +7,11 @@ import sys
 
 ##################
 URL = sys.argv[1]  # test URL
-targetDevice = '/dev/nvme0n1p4'
+targetDevice = sys.argv[2]  # '/dev/nvme0n1p4'
 warningFreq = 3600
 warningExtremeFreq = 1800
 detectorFreq = 3600
-##################
+#################
 
 while True:
     bashCommand = "df -h"
