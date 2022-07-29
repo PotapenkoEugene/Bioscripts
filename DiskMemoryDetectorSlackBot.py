@@ -47,7 +47,7 @@ while True:
     # Send warning or extreme warning if we near to the memory limit
     if int(usage.rstrip('%')) in warningRange:
         message = f"Disk space has reached *{usage}*.\nClear some space in {dir}."
-        bashCommand = f"curl -X POST -H \"Content-type:application/json\" --data \"{{\'text\':\'{message}\'}}\" {URL}"
+        bashCommand = f"curl -k -X POST -H \"Content-type:application/json\" --data \"{{\'text\':\'{message}\'}}\" {URL}"
         os.system(bashCommand)
         time.sleep(warningFreq)
         continue
