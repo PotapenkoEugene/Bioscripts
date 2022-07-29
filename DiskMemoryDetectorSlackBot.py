@@ -9,7 +9,9 @@ import sys
 URL = sys.argv[1]  # test URL
 targetDevice = sys.argv[2]  # '/dev/nvme0n1p4'
 warningFreq = 3600
+warningRange = range(80, 85)
 warningExtremeFreq = 1800
+warningExtremeRange = range(85, 90)
 detectorFreq = 3600
 #################
 
@@ -19,18 +21,16 @@ while True:
     output, error = process.communicate()
 
     usage, dir = [dev for dev in output.decode('utf-8').split('\n') if
-                     dev.startswith(targetDevice)][0].split()[4:6]
+                  dev.startswith(targetDevice)][0].split()[4:6]
 
-
-
-    if int(usage.rstrip('%')) in range(80,85):
+    if int(usage.rstrip('%')) in warningRange:
         message = f"Disk space has reached *{usage}*.\nClear some space in {dir}."
         bashCommand = f"curl -X POST -H \"Content-type:application/json\" --data \"{{\'text\':\'{message}\'}}\" {URL}"
         os.system(bashCommand)
         time.sleep(warningFreq)
         continue
 
-    elif int(usage.rstrip('%')) in range(85,96):
+    elif int(usage.rstrip('%')) in warningExtremeRange:
         message = f"Disk space has reached *{usage}*.\n*!!! Immediately !!!* clear some space in {dir}."
         bashCommand = f"curl -X POST -H \"Content-type:application/json\" --data \"{{\'text\':\'{message}\'}}\" {URL}"
         os.system(bashCommand)
@@ -38,5 +38,3 @@ while True:
         continue
 
     time.sleep(detectorFreq)
-
-
