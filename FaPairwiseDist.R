@@ -49,7 +49,8 @@ mds.data$Pseudo = gsub('^.*_', '', mds.data$Sample)
 out = paste0(outpath, '_MDSplor.png')
 png(file=out, width = 2400, height = 1200)
 
-ggplot(mds.data) +
-  geom_point(aes(X,Y,shape = KinPos, color = Pseudo), size = 5)
+ggplot(mds.data, aes(X,Y) +
+  geom_point(aes(shape = KinPos, color = Pseudo), size = 5) +
+  geom_line(aes(group = TK))
 
 dev.off()
