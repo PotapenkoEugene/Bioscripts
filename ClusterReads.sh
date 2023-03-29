@@ -25,6 +25,6 @@ for i in `seq 0 $(($NTOP-1))`
 	do
 	echo "Cluster_${i}" >> Cluster.list
 	faSomeRecords $clusters Cluster.list Cluster.${i}
-	cat Cluster.${i} | tail -n +2 | cut -f2 | cut -f2 -d ' ' | sed 's/>//' > Cluster.${i}.list
+	cat Cluster.${i} | tail -n +2 | cut -f2 | cut -f2 -d ' ' | sed 's/>//' | sed 's/\.\.\.//' > Cluster.${i}.list
 	faSomeRecords $fastaRE Cluster.${i}.list Cluster.${i}.fasta
 	done
