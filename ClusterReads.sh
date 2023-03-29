@@ -7,7 +7,7 @@ NTOP=$4
 
 # TRIM (specific options pasted)
 fastqTRIM=$(basename $FASTQ .fastq).trim.fastq
-fastp -w 16 -a GATCGGAAGAGCACACGTC -b 35 -i $FASTQ -o $fastqTRIM
+fastp -w 16 -a GATCGGAAGAGCACACGTC -b 35 --length_required 35 -i $FASTQ -o $fastqTRIM
 
 # 2fasta
 fasta=$(basename $fastqTRIM .fastq).fasta
@@ -29,10 +29,14 @@ for i in `seq 0 $(($NTOP-1))`
 	do
 	echo "${i}" > Cluster.list
 	faSomeRecords $clusters Cluster.list Cluster.${i}
-	cat Cluster.${i} | tail -n +2 | grep '35nt' | cut -f2 | cut -f2 -d ' ' | sed 's/>//' | sed 's/\.\.\.//' > Cluster.${i}.list
+	cat Cluster.${i} | tail -n +2 | cut -f2 | cut -f2 -d ' ' | sed 's/>//' | sed 's/\.\.\.//' > Cluster.${i}.list
 	faSomeRecords $fastaRE Cluster.${i}.list Cluster.${i}.fasta
+	
 	# Remove sequences with N
 	cat Cluster.${i}.fasta | grep -B1 N | grep '>' | sed 's/>//' > N.list
 	faSomeRecords -exclude Cluster.${i}.fasta N.list Cluster.${i}.f.fasta
+	
+	# Draw Logo
+	Rscript `which FastaToLogo.R` Cluster.${i}.f.fasta Cluster.${i}.LOGO.png
 
 	done
