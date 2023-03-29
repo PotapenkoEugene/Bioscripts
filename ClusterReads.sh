@@ -5,9 +5,13 @@ CPU=$2
 IDENTITY=$3
 NTOP=$4
 
+# TRIM (specific options pasted)
+fastqTRIM=$(basename $FASTQ .fastq).trim.fastq
+fastp -w 16 -a GATCGGAAGAGCACACGTC -b 35 --length_required 35 -i $FASTQ -o $fastqTRIM
+
 # 2fasta
-fasta=$(basename $FASTQ .fastq).fasta
-seqtk seq -a $FASTQ > $fasta 
+fasta=$(basename $fastqTRIM .fastq).fasta
+seqtk seq -a $fastqTRIM > $fasta 
 
 # Rename
 fastaRE=$(basename $fasta .fasta).RE.fasta
