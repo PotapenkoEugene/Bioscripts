@@ -19,7 +19,7 @@ cd-hit-est -T $CPU -M 0 -i $fastaRE -o $(basename $fastaRE .fasta) -c $IDENTITY
 
 # Retrieve sequences by clusters
 ## Rename cluster file
-sed -i $clusters 's/Cluster /Cluster_/'
+sed -i "s/Cluster /Cluster_/" $clusters
 ## Make list of read names for each cluster and retrieve sequences
 for i in `seq 0 $(($NTOP-1))`
 	do
