@@ -21,6 +21,9 @@ cat $fasta | awk '/^>/{print ">" ++i; next}{print}' > $fastaRE
 clusters=$(basename $fastaRE .fasta).clstr
 cd-hit-est -T $CPU -M 0 -i $fastaRE -o $(basename $fastaRE .fasta) -c $IDENTITY -sc 1
 
+# Count seqs in clusters
+echo -e 'Cluster\tNSEQ' > Clusters.stat | awk -F '\t' '/^>/ {if (n>0) print cluster"\t"n; cluster=$0; n=0; next} {n++} END {if (n>0) print cluster"\t"n}' $clusters | sed 's/>//' >> Clusters.stat
+
 # Retrieve sequences by clusters
 ## Rename cluster file
 sed -i "s/Cluster //" $clusters
@@ -37,6 +40,6 @@ for i in `seq 0 $(($NTOP-1))`
 	faSomeRecords -exclude Cluster.${i}.fasta N.list Cluster.${i}.f.fasta
 	
 	# Draw Logo
-	Rscript `which FastaToLogo.R` Cluster.${i}.f.fasta Cluster.${i}.LOGO.png
+	Rscript `which FastaToLogo.R` Cluster.${i}.f.fasta Cluster.${i}.PWM.tsv Cluster.${i}.LOGO.png
 
 	done
