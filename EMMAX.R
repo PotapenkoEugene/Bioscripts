@@ -5,7 +5,7 @@ library(magrittr)
 args = commandArgs(trailingOnly=TRUE)
 VCF=args[1]
 trait=fread(args[2], sep = '\t', header = T) # MAKE SURE THAT SAMPLES IN THE SAME ORDER AS IN VCF
-covariates=fread(args[3], sep = '\t', header = F) # MAKE SURE THAT SAMPLES IN THE SAME ORDER AS IN VCF
+covariates=fread(args[3], sep = '\t', header = T) # MAKE SURE THAT SAMPLES IN THE SAME ORDER AS IN VCF
 OUT=args[4]
 
 FUN_emmax <- function(VCF,  #TODO everytime make convertion of input file, should create separate function

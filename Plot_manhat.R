@@ -12,11 +12,12 @@ args = commandArgs(trailingOnly=TRUE)
 gwas_df=fread(args[1], sep = '\t', header = T) 
 pval_colname=args[2]
 snps_df=fread(args[3], sep = '\t', header = T)
-pval.threshold=args[4] %>% as.numeric # Desired pval threshold before bonferonni correction
+threshold=args[4] # FDR or BC
 OUTSUFFIX=args[5]
 ######################
 
-pval.threshold = pval.threshold / nrow(snps_df)
+if(threshold == 'BC') {pval.threshold = 0.05 / nrow(snps_df)}
+if(threshold == 'FDR') {qval.threshold = 0.05}
 
 FUN_manhat <- function(pvalue, #vector
                        snps, # snps full
@@ -110,11 +111,18 @@ FUN_manhat <- function(pvalue, #vector
   return(gPlot)
 }
 
+if(threshold == 'BC'){
 gPic <-
 	FUN_manhat(gwas_df[[pval_colname]], 
 	   snps_df, 
 	   pval.threshold = pval.threshold
-	   #qval.threshold = 0.05
 	)
+} else {
+gPic <-
+        FUN_manhat(gwas_df[[pval_colname]], 
+           snps_df, 
+           qval.threshold = qval.threshold
+	)
+}
 ggsave(paste0(OUTSUFFIX, '.png'), 
        plot = gPic)

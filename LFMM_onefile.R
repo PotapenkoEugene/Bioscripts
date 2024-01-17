@@ -2,7 +2,7 @@
 library(LEA)
 library(dplyr)
 library(data.table)
-#library(WGCNA)
+library(WGCNA)
 args = commandArgs(trailingOnly=TRUE)
 #################################
 LFMM_imp = args[1]
@@ -38,9 +38,14 @@ lfmm.res <-
 print(lfmm.res %>% str)
 
 message('INFO: SAVE PVALUES')
-lfmm.res$pvalues %>%
-	t %>%
+if(ncol(lfmm.res$pvalues) != ncol(predictors)){ # For more than one trait it needed to be transposed
+	lfmm.res$pvalues %>%
+	transposeBigData %>%
 	as.data.table %>%
 	fwrite(paste0(OUTPREFIX, '.pvalues.tsv'), sep = '\t', col.names = T, row.names = F, quote = F)
+		 } else{
+		lfmm.res$pvalues %>%
+        	fwrite(paste0(OUTPREFIX, '.pvalues.tsv'), sep = '\t', col.names = T, row.names = F, quote = F)
+}
 
 message('INFO: SUCCESSFUL FINISHED')

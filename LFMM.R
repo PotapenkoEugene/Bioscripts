@@ -50,10 +50,14 @@ lfmm.res <-
 message(lfmm.res %>% str)
 
 message('INFO: SAVE PVALUES')
-lfmm.res$pvalues %>%
+if(ncol(lfmm.res$pvalues) != ncol(predictors)){ # For more than one trait it needed to be transposed
+	lfmm.res$pvalues %>%
 	transposeBigData %>%
 	fwrite(paste0(OUTPREFIX, '.pvalues.tsv'), sep = '\t', col.names = T, row.names = F, quote = F)
-
+		 } else{
+		lfmm.res$pvalues %>%
+        	fwrite(paste0(OUTPREFIX, '.pvalues.tsv'), sep = '\t', col.names = T, row.names = F, quote = F)
+}
 message('INFO: FINISH')
 
 

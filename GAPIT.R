@@ -20,8 +20,6 @@ if(!require('stringr')) install.packages('stringr'); library(stringr)
 if(!require('icesTAF')) install.packages('icesTAF'); library(icesTAF)
 
 args = commandArgs(trailingOnly=TRUE)
-
-
 getwd()
 
 # load files
