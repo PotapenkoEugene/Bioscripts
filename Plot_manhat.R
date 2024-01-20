@@ -11,7 +11,7 @@ args = commandArgs(trailingOnly=TRUE)
 ######################
 gwas_df=fread(args[1], sep = '\t', header = T) 
 pval_colname=args[2]
-snps_df=fread(args[3], sep = '\t', header = T)
+snps_df=fread(args[3], sep = ' ', header = T)
 threshold=args[4] # FDR or BC
 OUTSUFFIX=args[5]
 ######################

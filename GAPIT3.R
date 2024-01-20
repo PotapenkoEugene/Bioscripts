@@ -3,9 +3,9 @@
 
 ### ARGS
 # 1 - LFMM # .lfmm extension must Further can add here vcf2lfmm function to take as input only VCF #TODO 
-# 2 - VCF - grep -v '#'' VCF | cut -f1-9 
-# 3 - Samples 
-# 4 - Phen file with 1 trait (column)
+# 2 - VCFSNP - produced after vcf2lfmm conversion
+# 3 - SAMPLES list each on new line
+# 4 - Phen file
 # 5 - MODELS - list of models separated by comma: BLINK,FarmCPU,SUPER...
 # 6 - PCs number that explain population structure
 # 7 - Kinship algorithm (VanRaden, Zhang, Loiselle and EMMA)
@@ -24,56 +24,59 @@ getwd()
 
 # Parse arguments
 LFMM = args[1] ; NAME = gsub('.lfmm', '', LFMM)
-VCF = args[2]
-SAMPLES = read.table(args[3], head = F)
+VCFSNP = args[2] # produced after vcf2lfmm conversion
+SAMPLES = args[3]
 PHEN.table = args[4] # table of traits
-PHEN.name = args[5] # name of desired trait from PHEN.table to analyze
-MODELS = args[6]
-PCA_total = args[7] %>% as.numeric
-KINSHIP_alg = args[8]
-WORKDIR = args[9] ; mkdir(WORKDIR)
+MODELS = args[5]
+PCA_total = args[6] %>% as.numeric
+KINSHIP_alg = args[7]
+WORKDIR = paste0(getwd(), '/', args[8]) ; mkdir(WORKDIR) # NAME OF THE DIR THAT WILL BE CREATED IN CURRENT DIRECTORY
+#################################
 
-# Set wd for output all files there
-setwd(WORKDIR)
-message(paste('INFO: WORKDIR:', getwd()))
+samples = fread(SAMPLES, header = F)$V1
 
 # Create/Load files
 ## GD
-GD = paste0(NAME, '.GD')
+GD = paste0(WORKDIR, '/', NAME, '.GD')
+message(paste0('INFO: LOAD GD FILE: ', GD))
 if(!file.exists(GD)){
-	cbind(Taxa = SAMPLES, 
-	      fread(LFMM)) %>%
-	fwrite(GD, col.names = T, row.names = F, quote = F, sep = '\t')
+	message('INFO: THERE IS NO GD FILE -> CREATING FROM LFMM FILE')
+	myGD <-
+		cbind(Taxa = samples, 
+		      fread(LFMM))
+	message('INFO: SAVE GD FILE')
+	myGD %>%
+		fwrite(GD, col.names = T, row.names = F, quote = F, sep = '\t')
 } else { myGD <- fread(GD, header = TRUE, sep = '\t')}
 
 ## GM
-GM = paste0(NAME, '.GM')
+GM = paste0(WORKDIR, '/', NAME, '.GM')
+message(paste0('INFO: LOAD GM FILE: ', GM))
 if(!file.exists(GM)){
+	message('INFO: THERE IS NO GM FILE -> CREATING FROM VCFSNP FILE')
 	myGM <-
-		fread(cmd = paste('grep -v \"##\"', 
-			  VCF, 
-			  '| cut -f1-9')) %>%
-		setNames(gsub('#', '', colnames(.))) %>%
+		fread(VCFSNP, sep = ' ', header = F) %>%
 		dplyr::mutate(Name = paste0('V', 1:n())) %>%
-		dplyr::select(Name, CHROM, POS) %>%
+		dplyr::select(Name, V1, V2) %>%
 		setNames(c('Name', 'Chromosome', 'Position')) %>%
 		as.data.table 
-	
+	message('INFO: SAVE GM FILE')
 	myGM %>%
 		fwrite(GM, sep = '\t', row.names = F, quote = F)
-} else { myGM <- fread(GM, header = TRUE, sep = '\t')
+} else { myGM <- fread(GM, header = TRUE, sep = '\t') }
 
 ## PHEN - Y
-YY = paste0(PHEN.name, '.Y')
+YY = paste0(WORKDIR, '/PHENOTYPES.Y')
+message(paste0('INFO: LOAD GAPIT PHENOTYPE FILE (Y): ', YY))
 if(!file.exists(YY)){
-	phen <-
+	message(paste0('INFO: THERE IS NO GAPIT PHENOTYPE FILE -> CREATING FROM PHENOTYPE TABLE'))
+	myY <-
 		read.table(PHEN.table, sep = '\t', header = T) %>%
-		dplyr::select(!!PHEN.name) %>%
-		cbind(Taxa = SAMPLES, .)
-	phen %>%
+		cbind(Taxa = samples, .)
+	message('INFO: SAVE GAPIT PHENOTYPE FILE')
+	myY %>%
 		write.table(YY, col.names = T, row.names = F, quote = F, sep = '\t')
-
-} else { read.table(YY, head = TRUE, sep = '\t') }
+} else { myY = read.table(YY, head = TRUE, sep = '\t') }
 
 # Parameters
 models <- MODELS %>% str_split(',') %>% unlist
@@ -84,6 +87,7 @@ setwd(WORKDIR)
 message(paste('INFO: WORKDIR:', getwd()))
 
 # Run GAPIT
+message('INFO: RUN GAPIT3 PIPELINE')
 GAPIT(
         Y=myY,
         GD=myGD,
@@ -101,5 +105,9 @@ GAPIT(
         file.output = T,                         # plot 3d interactive PCA
 	kinship.algorith = kinship.algo
       )
+message('INFO: GAPIT3 PIPELINE FINISHED')
 
+message('INFO: WARNINGS DURING WORK:')
 warnings()
+
+

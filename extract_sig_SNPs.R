@@ -7,7 +7,7 @@ library(qvalue)
 args <- commandArgs(trailingOnly = TRUE)
 PVALS = args[1] # tsv table of pvals from association analysis tool
 SNPs = args[2] # snp table (from 1 to 9 first vcf columns with corresponding colnames
-	data = cbind(fread(SNPs, sep = '\t', header = T),
+	data = cbind(fread(SNPs, sep = ' ', header = T),
 		     fread(PVALS, sep = '\t', header = T))
 OUTSUFFIX = args[3]
 threshold = args[4] # FDR or BC 
