@@ -21,9 +21,12 @@ FUN_candidate <- function(outliers, GFF3, DISTANCE = 50000){
   outliers %<>%
 	  dplyr::mutate(SNP = paste0('V', 1:n())) %>%
 	  dplyr::select(SNP, everything()) %>%
-	  setNames(c('SNP', 'CHR', 'BP')) %>%
-	  dplyr::mutate(P = 'sig')
-	message('INFO: TRANSFORM GFF3 FILE')
+	  setNames(c('SNP', 'CHR', 'BP', 'P'))
+
+  	  message(outliers %>% str)
+	 
+ 	  message('INFO: TRANSFORM GFF3 FILE')
+
   gff.gene <-
     fread(cmd = paste0('grep mRNA ', GFF3)) %>% # read gff and find in mRNA tags
       dplyr::select(V1,V3,V4,V5,V9) %>%

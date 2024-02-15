@@ -22,7 +22,9 @@ outliers.list <-
   mclapply(traits, function(trait) {
 
     data[data[[trait]] < pval.threshold[trait],] %>%
-	    dplyr::select(CHROM, POS)
+	    dplyr::select(CHROM, POS, !!trait) %>%
+	    dplyr::rename(pval = !!trait) %>%
+	    dplyr::arrange(pval)
 
   }, mc.cores = ncol(data) - 9) %>%
   setNames(traits)
