@@ -10,10 +10,15 @@ SNPs = args[2] # snp table (from 1 to 9 first vcf columns with corresponding col
 	data = cbind(fread(SNPs, sep = ' ', header = T),
 		     fread(PVALS, sep = '\t', header = T))
 OUTSUFFIX = args[3]
-threshold = args[4] # FDR or BC 
+threshold = args[4] # FDR or BC or MANUAL=N (N = -log10(p.value) 
 ############
 if(threshold == 'BC'){pval.threshold = rep(0.05 / nrow(data), ncol(data) - 9)} # the same for each trait
 if(threshold == 'FDR'){pval.threshold = sapply(data[,10:ncol(data)], function(col) col[qvalue(col)$qvalues < 0.05] %>% max )} # different for each trait
+if(startsWith(threshold, 'MANUAL')){
+	num = threshold %>% gsub('MANUAL=', '', .) %>% as.numeric 
+	pval.threshold = rep(10^(-num), ncol(data) - 9) # reverse from -log10 to pvalue
+}
+
 traits = colnames(data[,10:ncol(data)])
 names(pval.threshold) = traits
 

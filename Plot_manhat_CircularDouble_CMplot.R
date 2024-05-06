@@ -1,3 +1,6 @@
+if(!require('dplyr')) install.packages('dplyr'); library('dplyr')
+if(!require('data.table')) install.packages('data.table'); library('data.table')
+source("https://raw.githubusercontent.com/YinLiLin/CMplot/master/R/CMplot.r")
 
 args = commandArgs(trailingOnly=TRUE)
 ################################
@@ -9,22 +12,26 @@ TRAIT = args[4]
 
 
 # Prepare DFs
+message('INFO: PREPARING SNPs DATA FRAME')
 snps = fread(SNPs, header = T) %>% dplyr::select(CHROM, POS) %>%
   dplyr::mutate(SNP = paste0('V', 1:n())) %>%
   dplyr::select(SNP, everything()) %>%
   setNames(c('SNP', 'Chromosome', 'Position'))
 
+message('INFO: PREPARING GWAS1 DATA FRAME')
 lfmm.res = fread(GWAS1, sep = '\t', header = T) %>%
   setNames(gsub('bio', 'bio_', colnames(.)))
 
+message('INFO: PREPARING GWAS2 DATA FRAME')
 emmax.res = fread(GWAS2, sep = '\t', header = T)
 
 pval.threshold = 0.05 / nrow(snps)
 
 # Plot
+message('INFO: PLOTTING')
 CMplot(cbind(snps,
              LFMM = lfmm.res[[TRAIT]],
-             EMMAX = emmax.res[[TRAIT]]),
+             EMMAX = emmax.res[[TRAIT]]) %>% as.data.frame, # return some error to data.table 
        type="p",
        plot.type="c",
        r=0.4,
@@ -42,7 +49,7 @@ CMplot(cbind(snps,
        chr.den.col=c("darkgreen","yellow","red"),
        bin.size=1e6,
        outward=FALSE,
-
+       file.name = paste0('CMplot_CircularDouble_EMMAXandLFMM_', TRAIT, '.png'),
        file="jpg",
        dpi=300,
        file.output=TRUE,
