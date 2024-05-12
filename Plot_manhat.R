@@ -11,7 +11,7 @@ args = commandArgs(trailingOnly=TRUE)
 ######################
 gwas_df=fread(args[1], sep = '\t', header = T) 
 pval_colname=args[2]
-snps_df=fread(args[3], sep = ' ', header = T)
+snps_df=fread(args[3], sep = ' ', header = T) %>% dplyr::select(CHROM, POS)
 threshold=args[4] # FDR or BC
 OUTSUFFIX=args[5]
 ######################
@@ -55,20 +55,23 @@ FUN_manhat <- function(pvalue, #vector
       dplyr::mutate(sig = paste0('V', 1:nrow(snps)) %in% sig)
   }
   
-  # Labels 
-  if(!is.null(labels)){
-    df %<>%
-      left_join(labels, by = c('CHROM', 'POS'))
-  } else { df$gene = 'nolabels' }
-  
   # INFO
   message('INFO: Printed df structure:')
   print(df %>% str)
 
+  # Labels 
+  if(!is.null(labels)){
+    df %<>%
+      left_join(labels, by = c('CHROM', 'POS'))
+	
+    gPlot <- df %>% ggplot(aes(x = POS, y = -log10(pval), color = sig, label = gene))	
+  } else {
+    gPlot <- df %>% ggplot(aes(x = POS, y = -log10(pval), color = sig))
+  }
+  
+  # Continue plotting
   gPlot <-
-    df %>%
-    # Plot
-    ggplot(aes(x = POS, y = -log10(pval), color = sig, label = gene)) +
+    gPlot +
           facet_wrap2(vars(CHROM), nrow=1) + #, scales = "free_x", switch = "x")  +
           geom_scattermore(pointsize = pointsize) +
           geom_hline(yintercept=-log10(pval.threshold), linetype="dashed", color = "black") +
@@ -79,14 +82,15 @@ FUN_manhat <- function(pvalue, #vector
                 axis.text.x = element_blank(),
                 axis.title = element_text(size = 15),
                 axis.ticks.x = element_blank(),
-                legend.position = 'none'
-              )
-  
+                legend.position = 'none'							
+              )													
+  										message("INFO: check gPlot object properly created")
+	  print(gPlot %>% str)
   # Lines
   if(!is.null(highlight.lines)){ 
     
     for(i in 1:length(highlight.lines)){
-                                                                                                message('VLINE')
+                                                                                                message(paste0('INFO: DRAW VLINE',i))
       chr = highlight.lines[[i]][1]
       pos = highlight.lines[[i]][2] %>% as.numeric
       
@@ -98,16 +102,16 @@ FUN_manhat <- function(pvalue, #vector
                    alpha = line.alpha)
       }
   }
-  
+  											   
   # Labels
-  if(!is.null(labels)){
-    
+  if(!is.null(labels)){	
+    												message('INFO: LABELING')
     gPlot <-
       gPlot +
       geom_text_repel(color = 'black', max.overlaps = 9999, size = 2.5, alpha = 0.5)
   }
   
-  
+												message('INFO: SUCCESSFULLY PLOTTED')  
   return(gPlot)
 }
 
@@ -124,5 +128,11 @@ gPic <-
            qval.threshold = qval.threshold
 	)
 }
-ggsave(paste0(OUTSUFFIX, '.png'), 
-       plot = gPic)
+												message('INFO: LOOK ON RESULT GGPLOT OBJECT')
+print(gPic %>% str)
+										message(paste0('INFO: SAVE PLOT INTO: ', OUTSUFFIX, '.png'))
+
+#saveRDS(gPic, 'test.Rds') #TEMP
+
+ggsave(filename = paste0(OUTSUFFIX, '.png'), 
+      plot = gPic)
