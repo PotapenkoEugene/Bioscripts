@@ -9,13 +9,9 @@ VCFSNP=fread(args[3], sep = ' ', header = T)
 OUT=args[4]
 ######################
 
-df = cbind(SNP = paste0(VCFSNP$CHROM, ':', VCFSNP$POS),
+df = data.table(SNP = paste0(VCFSNP$CHROM, ':', VCFSNP$POS),
       CHR = VCFSNP$CHROM,
       POS = VCFSNP$POS,
-      pvalue = GWAS[[pval_colname]])
-
-print(df %>% str)
-
-df %>%
+      pvalue = GWAS[[pval_colname]]) %>%
 	dplyr::arrange(pvalue) %>%
-	fwrite(OUT, sep = '\t', row.names=F, col.names=F, quote = F)
+	fwrite(OUT, sep = '\t', row.names=F, col.names=T, quote = F)
