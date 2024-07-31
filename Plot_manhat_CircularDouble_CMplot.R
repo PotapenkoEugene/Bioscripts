@@ -4,34 +4,28 @@ source("https://raw.githubusercontent.com/YinLiLin/CMplot/master/R/CMplot.r")
 
 args = commandArgs(trailingOnly=TRUE)
 ################################
-SNPs = args[1] # space delimeter
-GWAS1 = args[2] # tsv 
-GWAS2 = args[3] # tsv
-TRAIT = args[4]
+GWAS1 = args[1] # LFMM gwasUniq custom format
+GWAS2 = args[2] # EMMAX gwasUniq custom format
+TRAIT = args[3]
 ################################
 
 
 # Prepare DFs
-message('INFO: PREPARING SNPs DATA FRAME')
-snps = fread(SNPs, header = T) %>% dplyr::select(CHROM, POS) %>%
-  dplyr::mutate(SNP = paste0('V', 1:n())) %>%
-  dplyr::select(SNP, everything()) %>%
-  setNames(c('SNP', 'Chromosome', 'Position'))
 
 message('INFO: PREPARING GWAS1 DATA FRAME')
 lfmm.res = fread(GWAS1, sep = '\t', header = T) %>%
-  setNames(gsub('bio', 'bio_', colnames(.)))
+	setNames(c('SNP', 'Chromosome', 'Position', 'LFMM'))
 
 message('INFO: PREPARING GWAS2 DATA FRAME')
 emmax.res = fread(GWAS2, sep = '\t', header = T)
 
-pval.threshold = 0.05 / nrow(snps)
+lfmm.res$EMMAX = emmax.res$pvalue
+
+pval.threshold = 0.05 / nrow(lfmm.res)
 
 # Plot
 message('INFO: PLOTTING')
-CMplot(cbind(snps,
-             LFMM = lfmm.res[[TRAIT]],
-             EMMAX = emmax.res[[TRAIT]]) %>% as.data.frame, # return some error to data.table 
+CMplot(lfmm.res  %>% as.data.frame, # return some error to data.table 
        type="p",
        plot.type="c",
        r=0.4,
@@ -51,7 +45,7 @@ CMplot(cbind(snps,
        outward=FALSE,
        file.name = paste0('CMplot_CircularDouble_EMMAXandLFMM_', TRAIT, '.png'),
        file="jpg",
-       dpi=300,
+       dpi=1200,
        file.output=TRUE,
        verbose=TRUE,
        width=10,height=10)
