@@ -23,7 +23,7 @@ lfmm.res = fread(GWAS1, sep = '\t', header = T) %>%
 if(is.null(pval_by_top)){
 	pval.threshold = 0.05 / nrow(lfmm.res)
 }else{
-	pval.threshold = lfmm.res %>% head(pval_by_top) %>% .[TRAIT] %>% max
+	pval.threshold = lfmm.res[[TRAIT]] %>% head(pval_by_top) %>% max
 }
 
 
@@ -42,7 +42,7 @@ CMplot(lfmm.res  %>% as.data.frame, # return some error to data.table
        signal.cex = 0.5,
        cex = 0.25,
        
-       file.name = paste0('CMplot_', TRAIT, '.png'),
+       file.name = paste0('CMplot_', TRAIT),
        file="png",
        dpi=1200,
        file.output=TRUE,
