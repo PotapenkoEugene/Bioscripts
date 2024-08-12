@@ -7,8 +7,9 @@ args = commandArgs(trailingOnly=TRUE)
 GWAS1 = args[1] # LFMM gwasUniq custom format
 GWAS2 = args[2] # EMMAX gwasUniq custom format
 TRAIT = args[3]
-if(length(args) == 4){
-	CUSTOM_SNP = fread(args[4], header = F)$V1 # should be list without header 
+SORTED = args[4] # T or F, if FALSE it will be sorted by script
+if(length(args) == 5){
+	CUSTOM_SNP = fread(args[5], header = F)$V1 # should be list without header 
 }else(CUSTOM_SNP = NULL)
 ################################
 
@@ -22,7 +23,16 @@ lfmm.res = fread(GWAS1, sep = '\t', header = T) %>%
 message('INFO: PREPARING GWAS2 DATA FRAME')
 emmax.res = fread(GWAS2, sep = '\t', header = T)
 
-lfmm.res$EMMAX = emmax.res$pvalue # Combine pvalues
+lfmm.res <-
+	lfmm.res %>%
+		left_join(emmax.res %>% dplyr::select(SNP, pvalue), by = 'SNP') %>%
+		dplyr::rename(EMMAX = pvalue)
+
+if(SORTED == 'F'){
+	lfmm.res <-
+		lfmm.res %>%
+		dplyr::arrange(Chromosome)
+}
 
 if(is.null(CUSTOM_SNP)){
 	pval.threshold = 0.05 / nrow(lfmm.res)

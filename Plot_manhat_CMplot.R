@@ -6,8 +6,9 @@ args = commandArgs(trailingOnly=TRUE)
 ################################
 GWAS1 = args[1] # LFMM gwasUniq custom format
 TRAIT = args[2]
-if(length(args) == 3){
- pval_by_top = args[3]
+SORTED = args[3] # T or F, if FALSE it will be sorted by chr
+if(length(args) == 4){
+ pval_by_top = args[4]
 }else{
  pval_by_top = NULL 
 }
@@ -26,6 +27,11 @@ if(is.null(pval_by_top)){
 	pval.threshold = lfmm.res[[TRAIT]] %>% head(pval_by_top) %>% max
 }
 
+if(SORTED == 'F'){
+	lfmm.res <-
+		lfmm.res %>%
+		dplyr::arrange(Chromosome)
+}
 
 # Plot
 message('INFO: PLOTTING')
