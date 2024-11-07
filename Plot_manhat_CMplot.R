@@ -7,8 +7,9 @@ args = commandArgs(trailingOnly=TRUE)
 GWAS1 = args[1] # LFMM gwasUniq custom format
 TRAIT = args[2]
 SORTED = args[3] # T or F, if FALSE it will be sorted by chr
-if(length(args) == 4){
- pval_by_top = args[4]
+CUSTOM_SNP = fread(args[4], header = F)$V1 # should be list without header, NA if highlight be pval threshold
+if(length(args) == 5){
+ pval_by_top = args[5]
 }else{
  pval_by_top = NULL 
 }
@@ -35,23 +36,51 @@ if(SORTED == 'F'){
 
 # Plot
 message('INFO: PLOTTING')
-CMplot(lfmm.res  %>% as.data.frame, # return some error to data.table 
-       plot.type="m", LOG10=TRUE, ylim=NULL,
-       threshold= pval.threshold,
-       threshold.lty=2,
-       threshold.lwd=1, 
-       threshold.col="black", 
-       amplify=T,
-       bin.size=1e6,
-        chr.den.col=c("darkgreen", "yellow", "red"),
-       signal.col = 'red',
-       signal.cex = 0.5,
-       cex = 0.25,
+if(CUSTOM_SNP == 'NA'){
+	CMplot(lfmm.res  %>% as.data.frame, # return some error to data.table 
+      	 	plot.type="m", LOG10=TRUE, ylim=NULL,
+       		threshold= pval.threshold,
+	       threshold.lty=2,
+       		threshold.lwd=1, 
+	       threshold.col="black", 
+	       amplify=T,
+	       bin.size=1e6,
+	        chr.den.col=c("darkgreen", "yellow", "red"),
+	       signal.col = 'red',
+	       signal.cex = 0.5,
+	       cex = 0.25,
        
-       file.name = paste0('CMplot_', TRAIT),
-       file="png",
-       dpi=1200,
-       file.output=TRUE,
-       verbose=TRUE,
-       width=10,height=6)
+	       file.name = paste0('CMplot_', TRAIT),
+	       file="png",
+	       dpi=1200,
+	       file.output=TRUE,
+	       verbose=TRUE,
+	       width=10,height=6)
+}else{
+	CMplot(lfmm.res  %>% as.data.frame, # return some error to data.table 
+                plot.type="m", LOG10=TRUE, ylim=NULL,
 
+		#threshold= pval.threshold,
+		highlight = CUSTOM_SNP,
+                highlight.cex = 0.5,
+                highlight.col = 'red',
+
+
+
+               threshold.lty=2,
+                threshold.lwd=1,
+               threshold.col="black",
+               amplify=T,
+               bin.size=1e6,
+                chr.den.col=c("darkgreen", "yellow", "red"),
+               signal.col = 'red',
+               signal.cex = 0.5,
+               cex = 0.25,
+       
+               file.name = paste0('CMplot_', TRAIT),
+               file="png",
+               dpi=1200,
+               file.output=TRUE,
+               verbose=TRUE,
+               width=10,height=6)
+}

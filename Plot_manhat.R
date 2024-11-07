@@ -4,7 +4,7 @@ if(!require('scattermore')) install.packages('scattermore'); library(scattermore
 if(!require('data.table')) install.packages('data.table'); library(data.table)
 if(!require('dplyr')) install.packages('dplyr'); library(dplyr)
 if(!require('ggh4x')) install.packages('ggh4x'); library(ggh4x)
-if(!require('qvalue')) install.packages('qvalue'); library(qvalue)
+if(!require('qvalue')) BiocManager::install('qvalue'); library(qvalue)
 if(!require('magrittr')) install.packages('magrittr'); library(magrittr)
 
 args = commandArgs(trailingOnly=TRUE)

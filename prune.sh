@@ -42,5 +42,5 @@ plink --vcf $VCF_f \
 VCF_f_LD=${VCF_f_name}.LD${r2threshold}.vcf
 
 # Edit OUT vcf - remove FAMID
-sed -i 's/\t0_/\t/g' $VCF_f
-sed -i 's/\t0_/\t/g' $VCF_f_LD
+sed -i '/^#/s/\t0_/\t/g' $VCF_f
+sed -i '/^#/s/\t0_/\t/g' $VCF_f_LD
