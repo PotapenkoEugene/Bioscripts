@@ -8,9 +8,9 @@ subpops=$5 # list of samples
 position=$6 # chr:start-end
 selevar=$7
 outprefix=$8
-density=1200 # svg2png
+density=300 # svg2png
 scale=0.4 # svg2png 
 
 LDBlockShow -InVCF $vcf -SubPop ${subpops} -InGWAS $gwasresult -InGFF $gff -SeleVar ${selevar} -NoShowLDist 9000000 -BlockType 1 -Region $position -OutPut ${outprefix} -NoGeneName -Cutline $cutline
-cairosvg -f png -o ${outprefix}.png ${outprefix}.svg
+cairosvg -d $density -f png -o ${outprefix}.png ${outprefix}.svg
 

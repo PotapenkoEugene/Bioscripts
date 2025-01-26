@@ -11,7 +11,16 @@ ZMIN=$7 # 0
 ZMAX=$8 # 20 is ok (remove outliers
 CPU=$9
 
-computeMatrix scale-regions -S $SIGNAL -R $PEAKS -b 3000 -a 3000 -o ComputeMatrix_${SUFFIX}.gz -p $CPU --samplesLabel $LABELS
+SORT_REGION='no'
+# Define output file
+OUTPUT_FILE="ComputeMatrix_${SUFFIX}.gz"
 
-plotHeatmap -m ComputeMatrix_${SUFFIX}.gz -out ComputeMatrix_${SUFFIX}.png --whatToShow 'heatmap and colorbar' --dpi 300 --boxAroundHeatmaps no --colorList 'white,blue' --interpolationMethod nearest --missingDataColor white --startLabel S --endLabel E --zMin $ZMIN --zMax $ZMAX
+# Check if the output file already exists
+if [ -f "$OUTPUT_FILE" ]; then
+    echo "File $OUTPUT_FILE already exists. Skipping the computation."
+else
+	computeMatrix scale-regions -S $SIGNAL -R $PEAKS -b 3000 -a 3000 -o ComputeMatrix_${SUFFIX}.gz -p $CPU --samplesLabel $LABELS
+fi
+
+plotHeatmap -m ComputeMatrix_${SUFFIX}.gz -out ComputeMatrix_${SUFFIX}.png --whatToShow 'heatmap and colorbar' --dpi 300 --boxAroundHeatmaps no --colorList 'white,blue' --interpolationMethod nearest --missingDataColor white --startLabel S --endLabel E --zMin $ZMIN --zMax $ZMAX --xAxisLabel '' --sortRegions $SORT_REGION
 

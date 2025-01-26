@@ -1,7 +1,7 @@
 
 args = commandArgs(trailingOnly=TRUE)
 LFMM_imp = args[1]
-VCF = args[2]
+VCF = args[2] # not imputed vcf for restoring information
 BLOCKSIZE = as.numeric(args[3])
 ##########################
 
@@ -11,11 +11,14 @@ library(WGCNA)
 # Convert  LFMM_imp file to VCF_imp, !! implementation only for full homozygotes !!
 
 # Transform lfmm imputed file into vcf file (WORKAROUND)
-geno_imp <-
+gt <-
 	fread(LFMM_imp) %>%
 	transposeBigData(blocksize = BLOCKSIZE)
-
-gt <- ifelse(geno_imp == 0, '0/0', '1/1')
+# Replace with VCF notation
+#TODO it's solution only for diploids (should look on .geno file for polyploids)
+gt[gt == 0] <- "0/0"
+gt[gt == 1] <- "0/1"
+gt[gt == 2] <- "1/1"
 
 colnames(gt) <- fread(cmd = paste("grep -A1 -m1 CHROM",
                                       VCF,
@@ -25,7 +28,7 @@ snps <- fread(cmd = paste("grep -v \'^##\'",
 			  "| cut -f1-9 "))
 
 # Check the equal number of dim:
-if(!dim(gt)[1] == dim(snps)[1]){ print('ERROR') } 
+if(!dim(gt)[1] == dim(snps)[1]){ print('ERROR: Not equal VCF and LFMM_imp SNPs') } 
 
 # Merge snps info and GT
 vcf.restored <- cbind(snps, gt)
