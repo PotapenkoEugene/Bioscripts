@@ -1,0 +1,2 @@
+#!/bin/bash
+kitten icat --background white --use-window-size 20,5,800,600 $1

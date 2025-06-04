@@ -1,3 +1,4 @@
 #!/bin/bash
 name=$1
-fastp -i ${name}1.fastq.gz -I ${name}2.fastq.gz -o ${name}1.trim.fastq.gz -O ${name}2.trim.fastq.gz -w 16
+extension=$2
+fastp -i ${name}_1.${extension} -I ${name}_2.${extension} -o ${name}_1_trim.fq.gz -O ${name}_2_trim.fq.gz -w 16

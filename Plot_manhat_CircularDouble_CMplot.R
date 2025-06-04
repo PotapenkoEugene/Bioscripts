@@ -41,12 +41,18 @@ if(is.null(CUSTOM_SNP)){
 	message('INFO: PLOTTING WITH PVALUE THRESHOLD')
 	CMplot(lfmm.res  %>% as.data.frame, # return some error to data.table 
 	       type="p",
-	       plot.type="c",
-	       r=0.4,
+	       #plot.type="c", #circular
+	       #r=0.4,
+	       
+	       plot.type='m',
+	       multracks= T,
+
 	       col=c("dodgerblue4", "deepskyblue"),
 	       cex = 0.2,
 	       signal.cex = 0.4,
-	
+		
+	       main = TRAIT,
+
 	       threshold= pval.threshold,
 	       cir.chr.h=1.5,
 	       amplify=T,
@@ -57,12 +63,17 @@ if(is.null(CUSTOM_SNP)){
 	       chr.den.col=c("darkgreen","yellow","red"),
 	       bin.size=1e6,
 	       outward=FALSE,
-	       file.name = paste0('CMplot_CircularDouble_EMMAXandLFMM_', TRAIT, '.png'),
+	       file.name = paste0('CMplot_CircularDouble_EMMAXandLFMM_', TRAIT),
 	       file="png",
-	       dpi=1200,
+	       dpi=600,
 	       file.output=TRUE,
 	       verbose=TRUE,
-	       width=10,height=10)
+
+	       chr.labels.angle=60,
+	       cex = 0.25,
+	       axis.cex = 0.85,
+
+	       width=10,height=5)
  }else{
 
 	 # Plot
@@ -95,6 +106,6 @@ if(is.null(CUSTOM_SNP)){
                dpi=1200,
                file.output=TRUE,
                verbose=TRUE,
-               width=10,height=10)
+               width=10,height=5)
 }
 
