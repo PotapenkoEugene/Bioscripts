@@ -3,12 +3,14 @@
 if(!require('dplyr')) BiocManager::install('dplyr'); library(dplyr)
 if(!require('data.table')) BiocManager::install('data.table'); library(data.table)
 if(!require('magrittr')) BiocManager::install('magrittr'); library(magrittr)
+if(!require('snpStats')) BiocManager::install('snpStats'); library(snpStats)
+if(!require('LDheatmap')) devtools::install_github("SFUStatgen/LDheatmap"); library(LDheatmap)
 if(!require('ttplot')) devtools::install_github("YTLogos/ttplot"); library(ttplot)
 if(!require('stringr')) BiocManager::install('stringr'); library(stringr)
 
 args <- commandArgs(trailingOnly = TRUE)
 ##################
-OUTLIERS = read.table(args[1], sep = '\t', head = T) # CHROM POS table
+OUTLIERS = fread(args[1]) # CHROM POS table
 GFF3 = args[2]
 DISTANCE = args[3] %>% as.numeric
 OUTTABLE = args[4]
