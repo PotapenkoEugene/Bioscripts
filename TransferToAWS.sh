@@ -1,4 +1,5 @@
 #!/bin/bash
+# test git
 AWSPATH=$1
 LOCALPATH=$2
 
