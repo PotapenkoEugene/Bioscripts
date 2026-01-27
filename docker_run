@@ -1,0 +1,10 @@
+#!/bin/bash
+
+docker run \
+  -w /data \
+  -v /mnt/data/eugene/TEMP:/tmp \
+  -v "$(pwd)":/data \
+  --rm \
+  -u "$(id -u):$(id -g)" \
+  "$@"
+
